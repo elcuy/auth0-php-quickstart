@@ -17,6 +17,10 @@ class Auth0IndexController extends Controller
     public function login()
     {
         if (Auth::check()) {
+            // Here we're using the redirect helper, and below we're calling
+            // the static method on the Redirect class directly. Either is
+            // fine, but it'd be great to have consistency across the whole
+            // sample code
             return redirect()->intended('/');
         }
 
@@ -37,6 +41,12 @@ class Auth0IndexController extends Controller
     {
         Auth::logout();
 
+        // This can be abstracted into the library or somewhere else
+        // through a function. Seems like it's standard and takes from
+        // the config values, so a function should be provided instead
+        // of building the URL manually. As a developer I would
+        // appreciate not having to do this in my code, but being able
+        // to customize it if needed.
         $logoutUrl = sprintf(
             'https://%s/v2/logout?client_id=%s&returnTo=%s',
             config('laravel-auth0.domain'),

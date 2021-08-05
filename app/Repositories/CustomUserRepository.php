@@ -19,11 +19,16 @@ class CustomUserRepository extends Auth0UserRepository
      */
     protected function upsertUser($profile)
     {
+        // Not a big deal, but we can suggest using destructuring (PHP7+).
+        // This makes it more scalable in the long run, if we want to
+        // add more properties to $profile
+        ["sub" => $sub, "email" => $email, "name" => $name] = $profile;
+
         return User::firstOrCreate(
-            ['sub' => $profile['sub']],
+            ['sub' => $sub],
             [
-                'email' => $profile['email'] ?? '',
-                'name' => $profile['name'] ?? '',
+                'email' => $email ?? '',
+                'name' => $name ?? '',
             ]
         );
     }
@@ -37,6 +42,8 @@ class CustomUserRepository extends Auth0UserRepository
      */
     public function getUserByDecodedJWT(array $decodedJwt): Authenticatable
     {
+        // No error handling here, we might want to handle exceptions
+        // properly in case this operation fails
         $user = $this->upsertUser($decodedJwt);
         return new Auth0JWTUser($user->getAttributes());
     }
@@ -50,6 +57,8 @@ class CustomUserRepository extends Auth0UserRepository
      */
     public function getUserByUserInfo(array $userinfo): Authenticatable
     {
+        // No error handling here, we might want to handle exceptions
+        // properly in case this operation fails
         $user = $this->upsertUser($userinfo['profile']);
         return new Auth0User($user->getAttributes(), $userinfo['accessToken']);
     }
